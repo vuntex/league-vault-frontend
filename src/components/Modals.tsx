@@ -153,6 +153,8 @@ export const AddSkinModal: React.FC<AddSkinModalProps> = ({
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const ownedSet = new Set(account.skinIds);
+
   const fetchIdRef = useRef(0);
   const pageRef = useRef(0);
   const queryRef = useRef("");
@@ -220,7 +222,7 @@ export const AddSkinModal: React.FC<AddSkinModalProps> = ({
       <div className="picker-scroll">
         <div className="picker-grid">
           {items.map((skin) => {
-            const owned = account.skinIds.includes(skin.id);
+            const owned = ownedSet.has(skin.id);
             return (
               <div
                 key={skin.id}

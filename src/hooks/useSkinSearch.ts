@@ -11,7 +11,7 @@ interface UseSkinSearchReturn {
 
 export function useSkinSearch(
   accounts: Account[],
-  allSkins: Skin[],
+  skinMap: Map<string, Skin>,
 ): UseSkinSearchReturn {
   const [query, setQuery] = useState("");
 
@@ -19,7 +19,7 @@ export function useSkinSearch(
     () =>
       accounts.flatMap((acc) =>
         acc.skinIds
-          .map((id) => allSkins.find((s) => s.id === id))
+          .map((id) => skinMap.get(id))
           .filter((s): s is Skin => s !== undefined)
           .map((s) => ({
             ...s,
@@ -27,7 +27,7 @@ export function useSkinSearch(
             accountName: acc.displayName,
           })),
       ),
-    [accounts, allSkins],
+    [accounts, skinMap],
   );
 
   const results = useMemo<FlatSkin[] | null>(() => {

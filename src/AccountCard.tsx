@@ -1,24 +1,23 @@
-import React, { useState } from "react";
-import ReactDOM from "react-dom";
-import type { Account, Skin } from "../types";
+import { memo, useState } from "react";
+import type { Account, Skin } from "./types";
 import {
   RANK_COLORS,
   RANK_ICONS,
   FALLBACK_ICON,
   profileIconUrl,
-} from "../constants";
+} from "./constants";
 
 interface AccountCardProps {
   account: Account;
   skinMap: Map<string, Skin>;
   refreshing: boolean;
-  onRefresh: (id: string) => void;
-  onDelete: (id: string) => void;
-  onAddSkin: (id: string) => void;
-  onRemoveSkin: (accountId: string, skinId: string) => void;
+  onRefresh: () => void;
+  onDelete: () => void;
+  onAddSkin: () => void;
+  onRemoveSkin: (skinId: string) => void;
 }
 
-const AccountCard: React.FC<AccountCardProps> = ({
+const AccountCard = memo<AccountCardProps>(function AccountCard({
   account: acc,
   skinMap,
   refreshing,
@@ -26,7 +25,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
   onDelete,
   onAddSkin,
   onRemoveSkin,
-}) => {
+}) {
   const [lightboxSkin, setLightboxSkin] = useState<Skin | null>(null);
 
   const accountSkins = acc.skinIds
@@ -48,24 +47,22 @@ const AccountCard: React.FC<AccountCardProps> = ({
 
   return (
     <>
-      {lightboxSkin &&
-        ReactDOM.createPortal(
-          <div className="skin-lb" onClick={() => setLightboxSkin(null)}>
-            <img
-              className="skin-lb-img"
-              src={lightboxSkin.splashUrl}
-              alt={lightboxSkin.skinName}
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = FALLBACK_ICON;
-              }}
-            />
-            <div className="skin-lb-info">
-              <div className="skin-lb-champ">{lightboxSkin.championName}</div>
-              <div className="skin-lb-name">{lightboxSkin.skinName}</div>
-            </div>
-          </div>,
-          document.body,
-        )}
+      {lightboxSkin && (
+        <div className="skin-lb" onClick={() => setLightboxSkin(null)}>
+          <img
+            className="skin-lb-img"
+            src={lightboxSkin.splashUrl}
+            alt={lightboxSkin.skinName}
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = FALLBACK_ICON;
+            }}
+          />
+          <div className="skin-lb-info">
+            <div className="skin-lb-champ">{lightboxSkin.championName}</div>
+            <div className="skin-lb-name">{lightboxSkin.skinName}</div>
+          </div>
+        </div>
+      )}
 
       <div className="acct-card">
         <div
@@ -152,7 +149,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
             <div className="card-btns">
               <button
                 className="ico-btn"
-                onClick={() => onRefresh(acc.id)}
+                onClick={onRefresh}
                 title="Rank aktualisieren"
                 disabled={refreshing}
               >
@@ -160,7 +157,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
               </button>
               <button
                 className="ico-btn del"
-                onClick={() => onDelete(acc.id)}
+                onClick={onDelete}
                 title="Löschen"
               >
                 ✕
@@ -186,7 +183,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
                 onClick={() => setLightboxSkin(skin)}
                 onContextMenu={(e) => {
                   e.preventDefault();
-                  onRemoveSkin(acc.id, skin.id);
+                  onRemoveSkin(skin.id);
                 }}
               >
                 <img src={skin.splashUrl} alt={skin.skinName} />
@@ -195,21 +192,11 @@ const AccountCard: React.FC<AccountCardProps> = ({
                   <span className="stc">{skin.championName}</span>
                   <span className="stn">{skin.skinName}</span>
                 </div>
-                <button
-                  className="skin-tile-rmv"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onRemoveSkin(acc.id, skin.id);
-                  }}
-                  title="Entfernen"
-                >
-                  ✕
-                </button>
               </div>
             ))}
             <button
               className="skin-add"
-              onClick={() => onAddSkin(acc.id)}
+              onClick={onAddSkin}
               title="Skin hinzufügen"
             >
               +
@@ -217,19 +204,35 @@ const AccountCard: React.FC<AccountCardProps> = ({
           </div>
 
           {refreshing && (
-            <div className="refreshing-indicator">
+            <div
+              style={{
+                marginTop: 10,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
               <div className="dots">
                 <div className="dot" />
                 <div className="dot" />
                 <div className="dot" />
               </div>
-              <span className="refreshing-text">API wird abgerufen…</span>
+              <span
+                style={{
+                  fontSize: 9,
+                  color: "var(--txt3)",
+                  letterSpacing: 2,
+                  textTransform: "uppercase",
+                }}
+              >
+                API wird abgerufen…
+              </span>
             </div>
           )}
         </div>
       </div>
     </>
   );
-};
+});
 
-export default React.memo(AccountCard);
+export default AccountCard;

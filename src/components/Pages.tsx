@@ -27,7 +27,7 @@ const PageHeader: React.FC<{ title: string; sub: string }> = ({
 
 interface AccountsPageProps {
   accounts: Account[];
-  skins: Skin[];
+  skinMap: Map<string, Skin>;
   totalSkins: number;
   refreshingId: string | null;
   onRefresh: (id: string) => void;
@@ -38,7 +38,7 @@ interface AccountsPageProps {
 
 export const AccountsPage: React.FC<AccountsPageProps> = ({
   accounts,
-  skins,
+  skinMap,
   totalSkins,
   refreshingId,
   onRefresh,
@@ -52,20 +52,18 @@ export const AccountsPage: React.FC<AccountsPageProps> = ({
       sub={`${accounts.length} Accounts · ${totalSkins} Skins gesamt`}
     />
     <div className="accts-grid">
-      {[...accounts]
-        .sort((a, b) => b.summonerLevel - a.summonerLevel)
-        .map((acc) => (
-          <AccountCard
-            key={acc.id}
-            account={acc}
-            skins={skins}
-            refreshing={refreshingId === acc.id}
-            onRefresh={() => onRefresh(acc.id)}
-            onDelete={() => onDelete(acc.id)}
-            onAddSkin={() => onAddSkin(acc.id)}
-            onRemoveSkin={(skinId) => onRemoveSkin(acc.id, skinId)}
-          />
-        ))}
+      {accounts.map((acc) => (
+        <AccountCard
+          key={acc.id}
+          account={acc}
+          skinMap={skinMap}
+          refreshing={refreshingId === acc.id}
+          onRefresh={onRefresh}
+          onDelete={onDelete}
+          onAddSkin={onAddSkin}
+          onRemoveSkin={onRemoveSkin}
+        />
+      ))}
     </div>
   </>
 );
@@ -74,7 +72,7 @@ export const AccountsPage: React.FC<AccountsPageProps> = ({
 
 interface SkinsPageProps {
   accounts: Account[];
-  skins: Skin[];
+  skinMap: Map<string, Skin>;
   totalSkins: number;
   query: string;
   onQueryChange: (q: string) => void;
@@ -85,7 +83,7 @@ interface SkinsPageProps {
 
 export const SkinsPage: React.FC<SkinsPageProps> = ({
   accounts,
-  skins,
+  skinMap,
   totalSkins,
   query,
   onQueryChange,
@@ -118,7 +116,7 @@ export const SkinsPage: React.FC<SkinsPageProps> = ({
     ) : (
       <GroupedSkinView
         accounts={accounts}
-        skins={skins}
+        skinMap={skinMap}
         onAddSkin={onAddSkin}
         onRemoveSkin={onRemoveSkin}
       />
@@ -155,21 +153,21 @@ const SearchResultsGrid: React.FC<{ results: FlatSkin[] }> = ({ results }) => {
 
 interface GroupedSkinViewProps {
   accounts: Account[];
-  skins: Skin[];
+  skinMap: Map<string, Skin>;
   onAddSkin: (accountId: string) => void;
   onRemoveSkin: (accountId: string, skinId: string) => void;
 }
 
 const GroupedSkinView: React.FC<GroupedSkinViewProps> = ({
   accounts,
-  skins,
+  skinMap,
   onAddSkin,
   onRemoveSkin,
 }) => (
   <>
     {accounts.map((acc) => {
       const accountSkins = acc.skinIds
-        .map((id) => skins.find((s) => s.id === id))
+        .map((id) => skinMap.get(id))
         .filter((s): s is Skin => s !== undefined);
 
       return (

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import type { Tab, NewAccountForm } from "./types";
 import { useAuth } from "./context/useAuth";
 import Sidebar from "./components/Sidebar";
@@ -51,15 +51,19 @@ const App: React.FC = () => {
     addSkin,
     removeSkin,
   } = useAccounts();
-  const { skins } = useSkins();
+  const { skinMap } = useSkins();
   const {
     query,
     setQuery,
     results: searchResults,
     totalCount: totalSkins,
-  } = useSkinSearch(accounts, skins);
+  } = useSkinSearch(accounts, skinMap);
 
   // ── Derived ────────────────────────────────────────────────────────────────
+  const sortedAccounts = useMemo(
+    () => [...accounts].sort((a, b) => b.summonerLevel - a.summonerLevel),
+    [accounts],
+  );
   const skinModalAccount =
     skinModalForId !== null
       ? (accounts.find((a) => a.id === skinModalForId) ?? null)
@@ -67,31 +71,39 @@ const App: React.FC = () => {
 
   // ── Handlers ───────────────────────────────────────────────────────────────
 
-  const handleRefresh = async (id: string) => {
-    setRefreshingId(id);
-    try {
-      const cooldown = await refreshRank(id);
-      if (cooldown && !cooldown.canRefresh) {
-        const mins = Math.ceil(cooldown.secondsRemaining / 60);
-        showToast(`⏳ Cooldown – noch ${mins} Minute${mins !== 1 ? "n" : ""}`);
-      } else {
-        showToast("✦ Rank aktualisiert");
+  const handleRefresh = useCallback(
+    async (id: string) => {
+      setRefreshingId(id);
+      try {
+        const cooldown = await refreshRank(id);
+        if (cooldown && !cooldown.canRefresh) {
+          const mins = Math.ceil(cooldown.secondsRemaining / 60);
+          showToast(
+            `⏳ Cooldown – noch ${mins} Minute${mins !== 1 ? "n" : ""}`,
+          );
+        } else {
+          showToast("✦ Rank aktualisiert");
+        }
+      } catch (e) {
+        showToast(`Fehler: ${parseApiError(e).detail}`);
+      } finally {
+        setRefreshingId(null);
       }
-    } catch (e) {
-      showToast(`Fehler: ${parseApiError(e).detail}`);
-    } finally {
-      setRefreshingId(null);
-    }
-  };
+    },
+    [refreshRank, showToast],
+  );
 
-  const handleDeleteAccount = async (id: string) => {
-    try {
-      await deleteAccount(id);
-      showToast("Account entfernt");
-    } catch (e) {
-      showToast(`Fehler: ${parseApiError(e).detail}`);
-    }
-  };
+  const handleDeleteAccount = useCallback(
+    async (id: string) => {
+      try {
+        await deleteAccount(id);
+        showToast("Account entfernt");
+      } catch (e) {
+        showToast(`Fehler: ${parseApiError(e).detail}`);
+      }
+    },
+    [deleteAccount, showToast],
+  );
 
   const handleSubmitNewAccount = async () => {
     if (!newAccountForm.summonerName.trim()) return;
@@ -116,14 +128,17 @@ const App: React.FC = () => {
     }
   };
 
-  const handleRemoveSkin = async (accountId: string, skinId: string) => {
-    try {
-      await removeSkin(accountId, skinId);
-      showToast("Skin entfernt");
-    } catch (e) {
-      showToast(`Fehler: ${parseApiError(e).detail}`);
-    }
-  };
+  const handleRemoveSkin = useCallback(
+    async (accountId: string, skinId: string) => {
+      try {
+        await removeSkin(accountId, skinId);
+        showToast("Skin entfernt");
+      } catch (e) {
+        showToast(`Fehler: ${parseApiError(e).detail}`);
+      }
+    },
+    [removeSkin, showToast],
+  );
 
   // ── Loading / Auth guards ──────────────────────────────────────────────────
 
@@ -137,8 +152,16 @@ const App: React.FC = () => {
 
   if (accountsLoading) {
     return (
-      <div className="app">
-        <div className="app-loading">Lade Daten…</div>
+      <div className="app-loading-screen">
+        <div className="app-loading-inner">
+          <div className="app-loading-logo">✦</div>
+          <div className="app-loading-label">League Vault</div>
+          <div className="app-loading-dots">
+            <span />
+            <span />
+            <span />
+          </div>
+        </div>
       </div>
     );
   }
@@ -178,8 +201,8 @@ const App: React.FC = () => {
           <div className="page-transition" key={tab}>
             {tab === "accounts" && (
               <AccountsPage
-                accounts={accounts}
-                skins={skins}
+                accounts={sortedAccounts}
+                skinMap={skinMap}
                 totalSkins={totalSkins}
                 refreshingId={refreshingId}
                 onRefresh={handleRefresh}
@@ -191,7 +214,7 @@ const App: React.FC = () => {
             {tab === "skins" && (
               <SkinsPage
                 accounts={accounts}
-                skins={skins}
+                skinMap={skinMap}
                 totalSkins={totalSkins}
                 query={query}
                 onQueryChange={setQuery}
