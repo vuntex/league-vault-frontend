@@ -50,8 +50,8 @@ const App: React.FC = () => {
     refreshRank,
     addSkin,
     removeSkin,
-  } = useAccounts();
-  const { skinMap } = useSkins();
+  } = useAccounts(isAuthenticated);
+  const { skinMap } = useSkins(isAuthenticated);
   const {
     query,
     setQuery,
@@ -168,9 +168,11 @@ const App: React.FC = () => {
 
   if (accountsError) {
     return (
-      <div className="app">
-        <div className="app-error">
-          <div>Fehler beim Laden: {accountsError}</div>
+      <div className="app-loading-screen">
+        <div className="app-loading-inner">
+          <div className="app-loading-logo app-loading-logo--error">✦</div>
+          <div className="app-loading-label">League Vault</div>
+          <div className="app-loading-error-msg">{accountsError}</div>
           <button className="btn-prim" onClick={() => window.location.reload()}>
             Neu laden
           </button>

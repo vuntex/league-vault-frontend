@@ -15,7 +15,7 @@ interface UseAccountsReturn {
   reload: () => Promise<void>;
 }
 
-export function useAccounts(): UseAccountsReturn {
+export function useAccounts(enabled: boolean): UseAccountsReturn {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -37,8 +37,13 @@ export function useAccounts(): UseAccountsReturn {
   }, []);
 
   useEffect(() => {
-    reload();
-  }, [reload]);
+    if (enabled) {
+      reload();
+    } else {
+      setIsLoading(false);
+      setError(null);
+    }
+  }, [enabled, reload]);
 
   // ── Mutations ─────────────────────────────────────────────────────────────
 

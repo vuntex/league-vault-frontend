@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import ReactDOM from "react-dom";
 import type { Account, Skin } from "../types";
 import {
@@ -27,11 +27,40 @@ const AccountCard: React.FC<AccountCardProps> = ({
   onAddSkin,
   onRemoveSkin,
 }) => {
-  const [lightboxSkin, setLightboxSkin] = useState<Skin | null>(null);
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
 
   const accountSkins = acc.skinIds
     .map((id) => skinMap.get(id))
     .filter((s): s is Skin => s !== undefined);
+
+  const lightboxSkin =
+    lightboxIdx !== null ? (accountSkins[lightboxIdx] ?? null) : null;
+  const hasPrev = lightboxIdx !== null && lightboxIdx > 0;
+  const hasNext = lightboxIdx !== null && lightboxIdx < accountSkins.length - 1;
+
+  const closeLb = useCallback(() => setLightboxIdx(null), []);
+  const goPrev = useCallback(
+    () => setLightboxIdx((i) => (i !== null && i > 0 ? i - 1 : i)),
+    [],
+  );
+  const goNext = useCallback(
+    () =>
+      setLightboxIdx((i) =>
+        i !== null && i < accountSkins.length - 1 ? i + 1 : i,
+      ),
+    [accountSkins.length],
+  );
+
+  useEffect(() => {
+    if (lightboxIdx === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeLb();
+      else if (e.key === "ArrowLeft") goPrev();
+      else if (e.key === "ArrowRight") goNext();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightboxIdx, closeLb, goPrev, goNext]);
 
   const rank = acc.rank;
   const tier = rank?.tier ?? "UNRANKED";
@@ -48,18 +77,48 @@ const AccountCard: React.FC<AccountCardProps> = ({
 
   return (
     <>
-      {lightboxSkin &&
+      {lightboxIdx !== null &&
+        lightboxSkin &&
         ReactDOM.createPortal(
-          <div className="skin-lb" onClick={() => setLightboxSkin(null)}>
+          <div className="skin-lb" onClick={closeLb}>
+            {hasPrev && (
+              <button
+                className="skin-lb-arrow skin-lb-arrow-prev"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  goPrev();
+                }}
+                aria-label="Vorheriger Skin"
+              >
+                ‹
+              </button>
+            )}
             <img
+              key={lightboxIdx}
               className="skin-lb-img"
               src={lightboxSkin.splashUrl}
               alt={lightboxSkin.skinName}
+              onClick={(e) => e.stopPropagation()}
               onError={(e) => {
                 (e.target as HTMLImageElement).src = FALLBACK_ICON;
               }}
             />
+            {hasNext && (
+              <button
+                className="skin-lb-arrow skin-lb-arrow-next"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  goNext();
+                }}
+                aria-label="Nächster Skin"
+              >
+                ›
+              </button>
+            )}
             <div className="skin-lb-info">
+              <div className="skin-lb-counter">
+                {lightboxIdx + 1} / {accountSkins.length}
+              </div>
               <div className="skin-lb-champ">{lightboxSkin.championName}</div>
               <div className="skin-lb-name">{lightboxSkin.skinName}</div>
             </div>
@@ -178,12 +237,12 @@ const AccountCard: React.FC<AccountCardProps> = ({
             </div>
           </div>
           <div className="skins-row">
-            {accountSkins.map((skin) => (
+            {accountSkins.map((skin, idx) => (
               <div
                 key={skin.id}
                 className="skin-tile"
                 title={`${skin.championName} · ${skin.skinName}`}
-                onClick={() => setLightboxSkin(skin)}
+                onClick={() => setLightboxIdx(idx)}
                 onContextMenu={(e) => {
                   e.preventDefault();
                   onRemoveSkin(acc.id, skin.id);
