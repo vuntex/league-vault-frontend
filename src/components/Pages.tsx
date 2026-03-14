@@ -33,7 +33,11 @@ interface AccountsPageProps {
   onRefresh: (id: string) => void;
   onDelete: (id: string) => void;
   onAddSkin: (id: string) => void;
-  onRemoveSkin: (accountId: string, skinId: string) => void;
+  onRemoveSkin: (
+    accountId: string,
+    skinId: string,
+    skipConfirm?: boolean,
+  ) => void;
 }
 
 export const AccountsPage: React.FC<AccountsPageProps> = ({
@@ -78,7 +82,11 @@ interface SkinsPageProps {
   onQueryChange: (q: string) => void;
   searchResults: FlatSkin[] | null;
   onAddSkin: (accountId: string) => void;
-  onRemoveSkin: (accountId: string, skinId: string) => void;
+  onRemoveSkin: (
+    accountId: string,
+    skinId: string,
+    skipConfirm?: boolean,
+  ) => void;
 }
 
 export const SkinsPage: React.FC<SkinsPageProps> = ({
@@ -155,7 +163,11 @@ interface GroupedSkinViewProps {
   accounts: Account[];
   skinMap: Map<string, Skin>;
   onAddSkin: (accountId: string) => void;
-  onRemoveSkin: (accountId: string, skinId: string) => void;
+  onRemoveSkin: (
+    accountId: string,
+    skinId: string,
+    skipConfirm?: boolean,
+  ) => void;
 }
 
 const GroupedSkinView: React.FC<GroupedSkinViewProps> = ({
@@ -218,8 +230,8 @@ const GroupedSkinView: React.FC<GroupedSkinViewProps> = ({
                   </div>
                   <button
                     className="gs-rmv"
-                    onClick={() => onRemoveSkin(acc.id, skin.id)}
-                    title="Entfernen"
+                    onClick={(e) => onRemoveSkin(acc.id, skin.id, e.shiftKey)}
+                    title="Entfernen (Shift+Klick zum direkten Löschen)"
                   >
                     ✕
                   </button>

@@ -5,6 +5,7 @@ interface MobileNavProps {
   tab: Tab;
   onTabChange: (tab: Tab) => void;
   onAddAccount: () => void;
+  onLogout: () => void;
 }
 
 interface NavItem {
@@ -23,6 +24,7 @@ const MobileNav: React.FC<MobileNavProps> = ({
   tab,
   onTabChange,
   onAddAccount,
+  onLogout,
 }) => {
   return (
     <nav className="mobile-nav">
@@ -39,6 +41,10 @@ const MobileNav: React.FC<MobileNavProps> = ({
       <button className="mobile-nav-item mobile-nav-add" onClick={onAddAccount}>
         <span className="mobile-nav-icon">+</span>
         <span className="mobile-nav-label">Neu</span>
+      </button>
+      <button className="mobile-nav-item mobile-nav-logout" onClick={onLogout}>
+        <span className="mobile-nav-icon">⏻</span>
+        <span className="mobile-nav-label">Logout</span>
       </button>
     </nav>
   );

@@ -15,7 +15,11 @@ interface AccountCardProps {
   onRefresh: (id: string) => void;
   onDelete: (id: string) => void;
   onAddSkin: (id: string) => void;
-  onRemoveSkin: (accountId: string, skinId: string) => void;
+  onRemoveSkin: (
+    accountId: string,
+    skinId: string,
+    skipConfirm?: boolean,
+  ) => void;
 }
 
 const AccountCard: React.FC<AccountCardProps> = ({
@@ -245,7 +249,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
                 onClick={() => setLightboxIdx(idx)}
                 onContextMenu={(e) => {
                   e.preventDefault();
-                  onRemoveSkin(acc.id, skin.id);
+                  onRemoveSkin(acc.id, skin.id, e.shiftKey);
                 }}
               >
                 <img src={skin.splashUrl} alt={skin.skinName} />
@@ -258,9 +262,9 @@ const AccountCard: React.FC<AccountCardProps> = ({
                   className="skin-tile-rmv"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onRemoveSkin(acc.id, skin.id);
+                    onRemoveSkin(acc.id, skin.id, e.shiftKey);
                   }}
-                  title="Entfernen"
+                  title="Entfernen (Shift+Klick zum direkten Löschen)"
                 >
                   ✕
                 </button>

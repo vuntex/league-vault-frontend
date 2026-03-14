@@ -255,3 +255,79 @@ export const AddSkinModal: React.FC<AddSkinModalProps> = ({
     </ModalShell>
   );
 };
+// ─── DeleteSkinModal ────────────────────────────────────────────────────────
+
+interface DeleteSkinModalProps {
+  skin: Skin;
+  onConfirm: () => void;
+  onClose: () => void;
+}
+
+export const DeleteSkinModal: React.FC<DeleteSkinModalProps> = ({
+  skin,
+  onConfirm,
+  onClose,
+}) => (
+  <ModalShell
+    title="Skin entfernen"
+    onClose={onClose}
+    footer={
+      <>
+        <button className="btn-sec" onClick={onClose}>
+          Abbrechen
+        </button>
+        <button className="btn-danger" onClick={onConfirm}>
+          Entfernen
+        </button>
+      </>
+    }
+  >
+    <p className="delete-modal-text">
+      Möchtest du den Skin{" "}
+      <strong>
+        {skin.championName} · {skin.skinName}
+      </strong>{" "}
+      wirklich entfernen?
+    </p>
+    <p className="delete-modal-hint">
+      Tipp: Halte <kbd>Shift</kbd> beim Klicken, um Skins direkt ohne
+      Bestätigung zu entfernen.
+    </p>
+  </ModalShell>
+);
+// ─── DeleteAccountModal ───────────────────────────────────────────────────────
+
+interface DeleteAccountModalProps {
+  account: Account;
+  onConfirm: () => void;
+  onClose: () => void;
+}
+
+export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
+  account,
+  onConfirm,
+  onClose,
+}) => (
+  <ModalShell
+    title="Account löschen"
+    onClose={onClose}
+    footer={
+      <>
+        <button className="btn-sec" onClick={onClose}>
+          Abbrechen
+        </button>
+        <button className="btn-danger" onClick={onConfirm}>
+          Löschen
+        </button>
+      </>
+    }
+  >
+    <p className="delete-modal-text">
+      Möchtest du den Account{" "}
+      <strong>
+        {account.summonerName}#{account.tagLine}
+      </strong>{" "}
+      wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.
+    </p>
+  </ModalShell>
+);

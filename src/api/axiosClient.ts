@@ -24,7 +24,8 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    if (error.response?.status === 401) {
+    const status = error.response?.status;
+    if (status === 401 || status === 403) {
       localStorage.removeItem("accessToken");
       // AuthContext übernimmt den Rest
       window.dispatchEvent(new Event("auth:logout"));

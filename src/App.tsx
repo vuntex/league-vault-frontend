@@ -3,7 +3,12 @@ import type { Tab, NewAccountForm } from "./types";
 import { useAuth } from "./context/useAuth";
 import Sidebar from "./components/Sidebar";
 import { AccountsPage, SkinsPage, StatsPage } from "./components/Pages";
-import { AddAccountModal, AddSkinModal } from "./components/Modals";
+import {
+  AddAccountModal,
+  AddSkinModal,
+  DeleteAccountModal,
+  DeleteSkinModal,
+} from "./components/Modals";
 import AuthPage from "./components/AuthPage";
 import { useToast } from "./hooks/useToast";
 import { useAccounts } from "./hooks/useAccounts";
@@ -28,6 +33,11 @@ const App: React.FC = () => {
   const [tab, setTab] = useState<Tab>("accounts");
   const [showAddAccount, setShowAddAccount] = useState(false);
   const [skinModalForId, setSkinModalForId] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [deleteSkinConfirm, setDeleteSkinConfirm] = useState<{
+    accountId: string;
+    skinId: string;
+  } | null>(null);
   const [refreshingId, setRefreshingId] = useState<string | null>(null);
   const [newAccountForm, setNewAccountForm] =
     useState<NewAccountForm>(EMPTY_FORM);
@@ -93,17 +103,21 @@ const App: React.FC = () => {
     [refreshRank, showToast],
   );
 
-  const handleDeleteAccount = useCallback(
-    async (id: string) => {
-      try {
-        await deleteAccount(id);
-        showToast("Account entfernt");
-      } catch (e) {
-        showToast(`Fehler: ${parseApiError(e).detail}`);
-      }
-    },
-    [deleteAccount, showToast],
-  );
+  const handleDeleteAccount = useCallback((id: string) => {
+    setDeleteConfirmId(id);
+  }, []);
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (deleteConfirmId === null) return;
+    try {
+      await deleteAccount(deleteConfirmId);
+      showToast("Account entfernt");
+    } catch (e) {
+      showToast(`Fehler: ${parseApiError(e).detail}`);
+    } finally {
+      setDeleteConfirmId(null);
+    }
+  }, [deleteConfirmId, deleteAccount, showToast]);
 
   const handleSubmitNewAccount = async () => {
     if (!newAccountForm.summonerName.trim()) return;
@@ -129,7 +143,11 @@ const App: React.FC = () => {
   };
 
   const handleRemoveSkin = useCallback(
-    async (accountId: string, skinId: string) => {
+    async (accountId: string, skinId: string, skipConfirm?: boolean) => {
+      if (!skipConfirm) {
+        setDeleteSkinConfirm({ accountId, skinId });
+        return;
+      }
       try {
         await removeSkin(accountId, skinId);
         showToast("Skin entfernt");
@@ -139,6 +157,18 @@ const App: React.FC = () => {
     },
     [removeSkin, showToast],
   );
+
+  const handleConfirmDeleteSkin = useCallback(async () => {
+    if (deleteSkinConfirm === null) return;
+    try {
+      await removeSkin(deleteSkinConfirm.accountId, deleteSkinConfirm.skinId);
+      showToast("Skin entfernt");
+    } catch (e) {
+      showToast(`Fehler: ${parseApiError(e).detail}`);
+    } finally {
+      setDeleteSkinConfirm(null);
+    }
+  }, [deleteSkinConfirm, removeSkin, showToast]);
 
   // ── Loading / Auth guards ──────────────────────────────────────────────────
 
@@ -233,6 +263,7 @@ const App: React.FC = () => {
           tab={tab}
           onTabChange={setTab}
           onAddAccount={() => setShowAddAccount(true)}
+          onLogout={logout}
         />
       </div>
 
@@ -252,6 +283,30 @@ const App: React.FC = () => {
           onClose={() => setSkinModalForId(null)}
         />
       )}
+
+      {deleteConfirmId !== null &&
+        (() => {
+          const acc = accounts.find((a) => a.id === deleteConfirmId);
+          return acc ? (
+            <DeleteAccountModal
+              account={acc}
+              onConfirm={handleConfirmDelete}
+              onClose={() => setDeleteConfirmId(null)}
+            />
+          ) : null;
+        })()}
+
+      {deleteSkinConfirm !== null &&
+        (() => {
+          const skin = skinMap.get(deleteSkinConfirm.skinId);
+          return skin ? (
+            <DeleteSkinModal
+              skin={skin}
+              onConfirm={handleConfirmDeleteSkin}
+              onClose={() => setDeleteSkinConfirm(null)}
+            />
+          ) : null;
+        })()}
 
       {toast && <div className="toast">{toast}</div>}
     </>
