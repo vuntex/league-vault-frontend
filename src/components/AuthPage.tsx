@@ -110,6 +110,11 @@ const AuthPage: React.FC = () => {
             >
               {loading ? "Lade…" : "Anmelden"}
             </button>
+            <div className="auth-public-hint">
+              <a href="/dashboard" className="auth-public-link">
+                Public Dashboard ansehen →
+              </a>
+            </div>
           </div>
         ) : (
           <div className="auth-form">
@@ -157,6 +162,11 @@ const AuthPage: React.FC = () => {
             >
               {loading ? "Lade…" : "Konto erstellen"}
             </button>
+            <div className="auth-public-hint">
+              <a href="/dashboard" className="auth-public-link">
+                Public Dashboard ansehen →
+              </a>
+            </div>
           </div>
         )}
       </div>

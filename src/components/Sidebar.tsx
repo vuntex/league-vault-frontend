@@ -18,6 +18,7 @@ interface SidebarProps {
 
 const NAV_ITEMS: NavItem[] = [
   { id: "accounts", icon: "◈", label: "Accounts" },
+  { id: "matches", icon: "◉", label: "Matches" },
   { id: "skins", icon: "✦", label: "Skins" },
   { id: "stats", icon: "◉", label: "Stats" },
 ];
@@ -32,6 +33,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const badges: Record<Tab, number | null> = {
     accounts: accountCount,
+    matches: null,
     skins: skinCount,
     stats: null,
   };

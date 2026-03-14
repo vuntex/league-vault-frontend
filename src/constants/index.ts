@@ -61,3 +61,17 @@ const ICON_BASE =
 export const FALLBACK_ICON = `${ICON_BASE}/1.png`;
 
 export const profileIconUrl = (iconId: number) => `${ICON_BASE}/${iconId}.png`;
+
+const DDRAGON_BASE = "https://ddragon.leagueoflegends.com/cdn/14.11.1/img";
+
+// Quadratisches Champion-Icon (für Match-Rows)
+export const championSquareUrl = (championName: string) =>
+  `${DDRAGON_BASE}/champion/${championName}.png`;
+
+// Splash Art (für Lightbox etc.)
+export const championSplashUrl = (championName: string) =>
+  `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championName}_0.jpg`;
+
+/** Loading Screen Art (308x560) */
+export const championLoadingUrl = (championName: string) =>
+  `https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${championName}_0.jpg`;

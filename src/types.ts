@@ -1,6 +1,6 @@
 // ─── Navigation ───────────────────────────────────────────────────────────────
 
-export type Tab = "accounts" | "skins" | "stats";
+export type Tab = "accounts" | "matches" | "skins" | "stats";
 
 // ─── Rank & Division ──────────────────────────────────────────────────────────
 
@@ -28,6 +28,14 @@ export type Region =
   | "BR"
   | "LAN"
   | "LAS";
+
+export type Position =
+  | "TOP"
+  | "JUNGLE"
+  | "MIDDLE"
+  | "BOTTOM"
+  | "UTILITY"
+  | "FILL";
 
 // ─── Skin ─────────────────────────────────────────────────────────────────────
 
@@ -63,6 +71,78 @@ export interface Skin {
   skinName: string;
   splashUrl: string;
   loadingUrl: string;
+}
+
+// ─── Match Tracking ───────────────────────────────────────────────────────────
+
+export interface Match {
+  id: string;
+  riotMatchId: string;
+  queueId: number;
+  win: boolean;
+  remake: boolean;
+  champion: string;
+  position: Position;
+  kills: number;
+  deaths: number;
+  assists: number;
+  kda: number;
+  damageDealt: number;
+  visionScore: number;
+  goldEarned: number;
+  csTotal: number;
+  csPerMinute: number;
+  durationSeconds: number;
+  lpBefore: number | null;
+  lpAfter: number | null;
+  lpChange: number | null;
+  playedAt: string;
+}
+
+export interface DailyRecap {
+  accountDisplayName: string;
+  gamesPlayed: number;
+  wins: number;
+  losses: number;
+  remakes: number;
+  lpChange: number;
+  avgKda: number;
+  mostPlayedChampion: string | null;
+  bestChampion: string | null;
+  bestGame: Match | null;
+  worstGame: Match | null;
+  currentWinStreak: number;
+  currentLossStreak: number;
+}
+
+export interface MatchStats {
+  totalGames: number;
+  wins: number;
+  losses: number;
+  winrate: number;
+  avgKda: number;
+  avgDamage: number;
+  avgCsPerMin: number;
+  avgVisionScore: number;
+  mostPlayedChampion: string;
+  mostPlayedGames: number;
+  mostPlayedWinrate: number;
+  longestWinStreak: number;
+  longestLossStreak: number;
+}
+
+export interface LpSnapshot {
+  tier: Rank;
+  division: Division;
+  lp: number;
+  absoluteLp: number;
+  wins: number;
+  losses: number;
+  recordedAt: string;
+}
+
+export interface SyncResult {
+  newMatches: number;
 }
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────

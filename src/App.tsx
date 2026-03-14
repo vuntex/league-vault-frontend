@@ -18,6 +18,7 @@ import { parseApiError } from "./api/axiosClient";
 import { useServerHealth } from "./hooks/useServerHealth";
 import ServerStatusBanner from "./components/ServerStatusBanner";
 import MobileNav from "./components/MobileNav";
+import MatchesPage from "./components/matches/MatchesPage";
 
 const EMPTY_FORM: NewAccountForm = {
   summonerName: "",
@@ -243,6 +244,11 @@ const App: React.FC = () => {
                 onRemoveSkin={handleRemoveSkin}
               />
             )}
+
+            {tab === "matches" && (
+              <MatchesPage accounts={accounts} showToast={showToast} />
+            )}
+
             {tab === "skins" && (
               <SkinsPage
                 accounts={accounts}
