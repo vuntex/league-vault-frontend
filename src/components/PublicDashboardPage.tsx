@@ -61,7 +61,15 @@ const PublicDashboardPage: React.FC = () => {
             <div className="logo-text">VAULT</div>
             <div className="logo-sub">Public Dashboard</div>
           </div>
-        </div>
+        </div>{" "}
+        <button
+          className="public-back-btn"
+          onClick={() => {
+            window.location.href = "/";
+          }}
+        >
+          ← Zurück zur App
+        </button>{" "}
       </div>
 
       <div className="public-dash-body">

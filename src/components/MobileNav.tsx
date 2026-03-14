@@ -42,6 +42,15 @@ const MobileNav: React.FC<MobileNavProps> = ({
         <span className="mobile-nav-icon">+</span>
         <span className="mobile-nav-label">Neu</span>
       </button>
+      <button
+        className="mobile-nav-item mobile-nav-public"
+        onClick={() => {
+          window.location.href = "/dashboard";
+        }}
+      >
+        <span className="mobile-nav-icon">⊙</span>
+        <span className="mobile-nav-label">Public</span>
+      </button>
       <button className="mobile-nav-item mobile-nav-logout" onClick={onLogout}>
         <span className="mobile-nav-icon">⏻</span>
         <span className="mobile-nav-label">Logout</span>

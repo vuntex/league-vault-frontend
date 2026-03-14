@@ -70,6 +70,18 @@ const Sidebar: React.FC<SidebarProps> = ({
         </button>
       </div>
 
+      <div className="sidebar-public">
+        <button
+          className="public-dash-btn"
+          onClick={() => {
+            window.location.href = "/dashboard";
+          }}
+        >
+          <span>⊙</span>
+          Public Dashboard
+        </button>
+      </div>
+
       <div className="sidebar-logout">
         <button className="logout-btn" onClick={onLogout}>
           Abmelden
