@@ -3122,6 +3122,8 @@ body {
   gap: 12px;
   margin-bottom: 28px;
   flex-wrap: wrap;
+  cursor: grab;
+  user-select: none;
 }
 
 .public-acct-card {
@@ -3136,13 +3138,12 @@ body {
   text-align: left;
   transition:
     border-color 0.2s,
-    background 0.2s,
-    transform 0.2s var(--ease-spring);
+    background 0.2s;
   min-width: 200px;
 }
 .public-acct-card:hover {
   border-color: var(--bdr2);
-  transform: translateY(-2px);
+  background: var(--bg3);
 }
 .public-acct-card.active {
   box-shadow: 0 4px 20px rgba(200, 155, 60, 0.15);
@@ -3179,6 +3180,10 @@ body {
   margin-top: 3px;
   letter-spacing: 0.3px;
 }
+.public-acct-lp {
+  font-weight: 500;
+  opacity: 0.8;
+}
 .public-acct-region {
   font-size: 10px;
   color: var(--txt3);
@@ -3213,10 +3218,19 @@ body {
     padding: 0 16px 48px;
   }
   .public-acct-row {
-    gap: 8px;
+    gap: 10px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .public-acct-row::-webkit-scrollbar {
+    display: none;
   }
   .public-acct-card {
-    min-width: 0;
-    flex: 1;
+    min-width: 155px;
+    flex-shrink: 0;
+    flex: none;
   }
 }

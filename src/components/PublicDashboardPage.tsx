@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   usePublicDashboard,
   usePublicAccountData,
@@ -12,6 +12,39 @@ import MatchStatsPanel from "./matches/MatchStatsPanel";
 const PublicDashboardPage: React.FC = () => {
   const { accounts, isLoading: accountsLoading, error } = usePublicDashboard();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  // Drag-to-scroll for account row
+  const rowRef = useRef<HTMLDivElement>(null);
+  const dragState = useRef({
+    active: false,
+    startX: 0,
+    scrollLeft: 0,
+    moved: false,
+  });
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    const el = rowRef.current;
+    if (!el) return;
+    dragState.current = {
+      active: true,
+      startX: e.pageX - el.offsetLeft,
+      scrollLeft: el.scrollLeft,
+      moved: false,
+    };
+    el.style.cursor = "grabbing";
+  };
+  const onMouseMove = (e: React.MouseEvent) => {
+    const ds = dragState.current;
+    if (!ds.active) return;
+    const el = rowRef.current!;
+    const dx = e.pageX - el.offsetLeft - ds.startX;
+    if (Math.abs(dx) > 4) ds.moved = true;
+    el.scrollLeft = ds.scrollLeft - dx;
+  };
+  const onMouseUp = () => {
+    dragState.current.active = false;
+    if (rowRef.current) rowRef.current.style.cursor = "";
+  };
 
   useEffect(() => {
     if (!selectedId && accounts.length > 0) {
@@ -74,7 +107,14 @@ const PublicDashboardPage: React.FC = () => {
 
       <div className="public-dash-body">
         {/* Account-Auswahl als Cards */}
-        <div className="public-acct-row">
+        <div
+          className="public-acct-row"
+          ref={rowRef}
+          onMouseDown={onMouseDown}
+          onMouseMove={onMouseMove}
+          onMouseUp={onMouseUp}
+          onMouseLeave={onMouseUp}
+        >
           {accounts.map((acc) => {
             const tier = acc.rank?.tier ?? "UNRANKED";
             const color = RANK_COLORS[tier];
@@ -82,7 +122,9 @@ const PublicDashboardPage: React.FC = () => {
               <button
                 key={acc.id}
                 className={`public-acct-card ${acc.id === selectedId ? "active" : ""}`}
-                onClick={() => setSelectedId(acc.id)}
+                onClick={() => {
+                  if (!dragState.current.moved) setSelectedId(acc.id);
+                }}
                 style={
                   acc.id === selectedId
                     ? { borderColor: color, background: `${color}12` }
@@ -104,6 +146,12 @@ const PublicDashboardPage: React.FC = () => {
                   </div>
                   <div className="public-acct-rank" style={{ color }}>
                     {acc.rank?.fullRank ?? "Unranked"}
+                    {acc.rank && (
+                      <span className="public-acct-lp">
+                        {" · "}
+                        {acc.rank.leaguePoints} LP
+                      </span>
+                    )}
                   </div>
                   <div className="public-acct-region">{acc.region}</div>
                 </div>

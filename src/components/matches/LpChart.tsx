@@ -113,7 +113,7 @@ const LpChart: React.FC<Props> = ({ snapshots, isLoading }) => {
         <ResponsiveContainer width="100%" height={160}>
           <LineChart
             data={snapshots}
-            margin={{ top: 4, right: 4, left: -28, bottom: 0 }}
+            margin={{ top: 4, right: 8, left: -4, bottom: 0 }}
           >
             <CartesianGrid
               strokeDasharray="3 3"
@@ -135,7 +135,7 @@ const LpChart: React.FC<Props> = ({ snapshots, isLoading }) => {
                   label={{
                     value: t.label,
                     position: "right",
-                    fill: "rgba(200,155,60,0.45)",
+                    fill: "rgba(200,155,60,0.65)",
                     fontSize: 9,
                   }}
                 />
@@ -152,11 +152,11 @@ const LpChart: React.FC<Props> = ({ snapshots, isLoading }) => {
             />
             <YAxis
               dataKey="absoluteLp"
-              tick={{ fill: "var(--txt3)", fontSize: 10 }}
+              tick={{ fill: "var(--txt2)", fontSize: 10 }}
               axisLine={false}
               tickLine={false}
               tickFormatter={(v: number) => rankLabel(v)}
-              width={60}
+              width={52}
             />
             <Tooltip content={<CustomTooltip />} />
             <Line
